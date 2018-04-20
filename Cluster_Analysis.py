@@ -1,12 +1,9 @@
-#import dependencies
+# Import dependencies
 import numpy as np
 from sklearn.cluster import KMeans
 import pandas as pd
 import gensim
 import warnings
-
-#hide runtime warnings
-#warnings.filterwarnings("ignore")
 
 # Load gensim model file
 filename = "gensim_file"
@@ -22,9 +19,9 @@ final_data = []
 for i, row in df.iterrows():
     comment_vectorized = []
     comment = row
-    comment_all_words = comment.split(sep=" ")
+    comment_words = comment.split(sep=" ")
 
-    for comment_w in comment_all_words:
+    for comment_w in comment_words:
         try:
             comment_vectorized.append(list(model[comment_w]))
         except Exception as e:
@@ -45,18 +42,12 @@ for i, row in df.iterrows():
     final_data.append(temp_row)
 X = np.asarray(final_data)
 
-print('Convert to array: COMPLETE') 
-
 # Use KMeans to perform clustering
 clf = KMeans(n_clusters=4, n_jobs=-1, max_iter=50000, random_state=1)
 clf.fit(X)
-print('Clustering: COMPLETE')
 
 # Save the csv file and provide labels
 comment_label = clf.labels_
 comment_cluster_df = pd.DataFrame(original_df)
-comment_cluster_df['comment_label'] = np.nan
-comment_cluster_df['comment_label'] = comment_label
 
-print('Saving...')
 comment_cluster_df.to_csv('./cluster_output.csv', index=False)
